@@ -119,6 +119,73 @@
     }
     .prize-remove:hover { color: var(--danger); }
 
+    /* ─── Bulk import ─── */
+    .bulk-toggle {
+      background: none;
+      border: 1.5px dashed var(--border);
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.18s;
+      text-align: center;
+    }
+    .bulk-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+    .bulk-panel {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .bulk-panel.open { display: flex; }
+
+    .bulk-textarea {
+      width: 100%;
+      min-height: 120px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.84rem;
+      color: var(--text);
+      background: var(--surface);
+      resize: vertical;
+      outline: none;
+      line-height: 1.6;
+    }
+    .bulk-textarea:focus { border-color: var(--accent); }
+    .bulk-hint {
+      font-size: 0.72rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .bulk-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-bulk-load {
+      flex: 1;
+      background: var(--accent);
+      color: #fff;
+      padding: 8px;
+      font-size: 0.78rem;
+      border-radius: 8px;
+    }
+    .btn-bulk-load:hover { background: #d4714a; }
+    .btn-bulk-cancel {
+      background: none;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      border-radius: 8px;
+    }
+    .btn-bulk-cancel:hover { border-color: var(--accent); color: var(--accent); }
+
     .add-prize-row {
       display: flex;
       gap: 8px;
@@ -359,6 +426,17 @@
     <div class="add-prize-row">
       <input class="add-input" id="addInput" type="text" placeholder="Название приза…" maxlength="40">
       <button class="btn btn-add" id="addBtn" title="Добавить">+</button>
+    </div>
+
+    <button class="bulk-toggle" id="bulkToggle">📋 Вставить списком</button>
+
+    <div class="bulk-panel" id="bulkPanel">
+      <textarea class="bulk-textarea" id="bulkText" placeholder="Шампанское для пары&#10;Танец с молодожёнами&#10;Торт вне очереди&#10;Фото с парой&#10;Бокал вина"></textarea>
+      <div class="bulk-hint">Каждый приз — с новой строки. Пустые строки игнорируются.</div>
+      <div class="bulk-actions">
+        <button class="btn btn-bulk-load" id="bulkLoadBtn">Загрузить в колесо</button>
+        <button class="btn btn-bulk-cancel" id="bulkCancelBtn">Отмена</button>
+      </div>
     </div>
 
     <div class="panel-actions">
@@ -628,6 +706,40 @@ document.getElementById('fsBtn').addEventListener('click', () => {
     document.exitFullscreen();
     document.getElementById('fsBtn').textContent = '⛶ Полный экран';
   }
+});
+
+// ─── Bulk import ─────────────────────────────────────────────────────────────
+document.getElementById('bulkToggle').addEventListener('click', () => {
+  const panel = document.getElementById('bulkPanel');
+  panel.classList.toggle('open');
+  document.getElementById('bulkToggle').textContent =
+    panel.classList.contains('open') ? '✕ Закрыть' : '📋 Вставить списком';
+  if (panel.classList.contains('open')) {
+    document.getElementById('bulkText').focus();
+  }
+});
+
+document.getElementById('bulkCancelBtn').addEventListener('click', () => {
+  document.getElementById('bulkPanel').classList.remove('open');
+  document.getElementById('bulkToggle').textContent = '📋 Вставить списком';
+  document.getElementById('bulkText').value = '';
+});
+
+document.getElementById('bulkLoadBtn').addEventListener('click', () => {
+  const raw = document.getElementById('bulkText').value;
+  const lines = raw.split('\n')
+    .map(l => l.trim())
+    .filter(l => l.length > 0)
+    .slice(0, 20); // максимум 20 призов
+
+  if (lines.length === 0) return;
+
+  prizes = lines;
+  document.getElementById('bulkText').value = '';
+  document.getElementById('bulkPanel').classList.remove('open');
+  document.getElementById('bulkToggle').textContent = '📋 Вставить списком';
+  currentAngle = 0;
+  renderList();
 });
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
