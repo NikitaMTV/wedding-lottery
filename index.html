@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Свадебная лотерея</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #fff8f2;
+      --surface: #ffffff;
+      --border: #f0e4d8;
+      --text: #3d2b1f;
+      --muted: #a08878;
+      --accent: #e8865a;
+      --accent-light: #fde8dc;
+      --danger: #e05050;
+    }
+
+    body {
+      font-family: 'Nunito', 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── Header ─── */
+    header {
+      text-align: center;
+      padding: 28px 20px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--text);
+    }
+    header p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 5px;
+      letter-spacing: 0.02em;
+    }
+
+    /* ─── Layout ─── */
+    .app {
+      display: flex;
+      flex: 1;
+      gap: 0;
+    }
+
+    /* ─── Side panel ─── */
+    .panel {
+      width: 280px;
+      min-width: 240px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      gap: 14px;
+      background: var(--surface);
+    }
+    .panel-title {
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .prize-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .prize-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+    }
+    .prize-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .prize-name {
+      flex: 1;
+      font-size: 0.88rem;
+      border: none;
+      background: transparent;
+      font-family: 'Nunito', sans-serif;
+      color: var(--text);
+      outline: none;
+    }
+    .prize-name:focus {
+      background: #fff;
+      border-radius: 3px;
+    }
+    .prize-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1;
+      padding: 0 2px;
+      transition: color 0.2s;
+    }
+    .prize-remove:hover { color: var(--danger); }
+
+    .add-prize-row {
+      display: flex;
+      gap: 8px;
+    }
+    .add-input {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.85rem;
+      font-family: 'Nunito', sans-serif;
+      outline: none;
+      background: var(--surface);
+      color: var(--text);
+    }
+    .add-input:focus { border-color: var(--accent); }
+    .btn {
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      transition: all 0.18s;
+    }
+    .btn-add {
+      background: var(--accent-light);
+      color: var(--accent);
+      padding: 8px 14px;
+      font-size: 1.2rem;
+    }
+    .btn-add:hover { background: var(--accent); color: #fff; }
+
+    .panel-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-top: 4px;
+      border-top: 1px solid var(--border);
+    }
+    .btn-spin {
+      background: var(--accent);
+      color: #fff;
+      padding: 13px;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(232,134,90,0.35);
+    }
+    .btn-spin:hover { background: #d4714a; box-shadow: 0 4px 14px rgba(232,134,90,0.45); }
+    .btn-spin:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; box-shadow: none; }
+    .btn-reset {
+      background: none;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      padding: 8px;
+      font-size: 0.75rem;
+      width: 100%;
+      border-radius: 8px;
+    }
+    .btn-reset:hover { border-color: var(--accent); color: var(--accent); }
+
+    .fullscreen-btn {
+      background: none;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      padding: 8px;
+      font-size: 0.75rem;
+      width: 100%;
+      cursor: pointer;
+      border-radius: 8px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      transition: all 0.18s;
+    }
+    .fullscreen-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ─── Wheel area ─── */
+    .wheel-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      position: relative;
+    }
+
+    .wheel-wrap {
+      position: relative;
+      display: inline-block;
+    }
+
+    /* pointer triangle */
+    .pointer {
+      position: absolute;
+      top: 50%;
+      right: -22px;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-top: 18px solid transparent;
+      border-bottom: 18px solid transparent;
+      border-right: 30px solid var(--accent);
+      z-index: 10;
+      filter: drop-shadow(0 2px 6px rgba(232,134,90,0.5));
+    }
+
+    canvas {
+      display: block;
+      border-radius: 50%;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+    }
+
+    /* center button overlay on canvas */
+    .spin-center {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 68px; height: 68px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 3px solid var(--accent);
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.58rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: all 0.2s;
+      z-index: 5;
+      box-shadow: 0 2px 8px rgba(232,134,90,0.3);
+    }
+    .spin-center:hover { background: var(--accent); color: #fff; box-shadow: 0 4px 14px rgba(232,134,90,0.45); }
+    .spin-center:disabled { cursor: not-allowed; background: var(--border); color: var(--muted); border-color: var(--border); box-shadow: none; }
+
+    /* ─── Winner overlay ─── */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255,248,242,0.94);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 24px;
+      animation: fadeIn 0.4s ease;
+    }
+    .overlay.show { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .winner-card {
+      background: var(--surface);
+      border: 2px solid var(--accent-light);
+      border-radius: 24px;
+      padding: 48px 72px;
+      text-align: center;
+      box-shadow: 0 12px 56px rgba(232,134,90,0.15);
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .winner-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .winner-prize {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .winner-emoji {
+      font-size: 3.2rem;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .confetti-row {
+      font-size: 1.5rem;
+      letter-spacing: 0.3em;
+    }
+    .btn-close {
+      background: var(--accent);
+      color: #fff;
+      padding: 14px 52px;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: 12px;
+      box-shadow: 0 3px 12px rgba(232,134,90,0.35);
+    }
+    .btn-close:hover { background: #d4714a; }
+
+    /* ─── Empty state ─── */
+    .empty-hint {
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* ─── Fullscreen styles ─── */
+    :fullscreen .panel { width: 300px; }
+    :fullscreen header { padding: 16px 20px 10px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Свадебная лотерея</h1>
+  <p>Нажмите на колесо или кнопку «Крутить» — и удача сама выберет победителя</p>
+</header>
+
+<div class="app">
+
+  <!-- ─── Panel ─── -->
+  <aside class="panel">
+    <div class="panel-title">Призы</div>
+
+    <ul class="prize-list" id="prizeList"></ul>
+
+    <div class="add-prize-row">
+      <input class="add-input" id="addInput" type="text" placeholder="Название приза…" maxlength="40">
+      <button class="btn btn-add" id="addBtn" title="Добавить">+</button>
+    </div>
+
+    <div class="panel-actions">
+      <button class="btn btn-spin" id="spinBtn">Крутить</button>
+      <button class="btn btn-reset" id="resetBtn">Сбросить результаты</button>
+      <button class="fullscreen-btn" id="fsBtn">⛶ Полный экран</button>
+    </div>
+  </aside>
+
+  <!-- ─── Wheel ─── -->
+  <main class="wheel-area">
+    <div class="wheel-wrap" id="wheelWrap">
+      <canvas id="wheel" width="520" height="520"></canvas>
+      <div class="pointer"></div>
+      <button class="spin-center" id="spinCenter">КРУТИТЬ</button>
+    </div>
+  </main>
+</div>
+
+<!-- ─── Winner overlay ─── -->
+<div class="overlay" id="overlay">
+  <div class="winner-card">
+    <div class="winner-label">Поздравляем! Вы выиграли</div>
+    <span class="winner-emoji">🎁</span>
+    <div class="winner-prize" id="winnerText"></div>
+    <div class="confetti-row" style="margin-top:12px">🎊 ✨ 🎉 ✨ 🎊</div>
+  </div>
+  <button class="btn btn-close" id="closeBtn">Продолжить</button>
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+const PALETTE = [
+  '#FF8C69','#FFB347','#FFD166','#74C0FC','#A8DADC',
+  '#C3A6FF','#FF9EAA','#6BCB77','#F4A261','#90E0EF',
+];
+
+let prizes = [
+  'Шампанское для пары',
+  'Танец с молодожёнами',
+  'Торт вне очереди',
+  'Фото с парой',
+  'Бокал вина',
+  'Конкурс-задание',
+];
+
+let spinning = false;
+let currentAngle = 0;
+
+// ─── Canvas setup ────────────────────────────────────────────────────────────
+const canvas = document.getElementById('wheel');
+const ctx = canvas.getContext('2d');
+const SIZE = canvas.width;
+const CX = SIZE / 2, CY = SIZE / 2, R = SIZE / 2 - 6;
+
+// ─── Draw wheel ───────────────────────────────────────────────────────────────
+function drawWheel(angle) {
+  ctx.clearRect(0, 0, SIZE, SIZE);
+  if (prizes.length === 0) {
+    ctx.fillStyle = '#eee';
+    ctx.beginPath();
+    ctx.arc(CX, CY, R, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#999';
+    ctx.font = '16px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Добавьте призы', CX, CY);
+    return;
+  }
+
+  const slice = (Math.PI * 2) / prizes.length;
+
+  prizes.forEach((prize, i) => {
+    const start = angle + i * slice;
+    const end = start + slice;
+    const color = PALETTE[i % PALETTE.length];
+
+    // Sector
+    ctx.beginPath();
+    ctx.moveTo(CX, CY);
+    ctx.arc(CX, CY, R, start, end);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Text
+    ctx.save();
+    ctx.translate(CX, CY);
+    ctx.rotate(start + slice / 2);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = isLight(color) ? '#2c2c2c' : '#ffffff';
+
+    const maxW = R - 32;
+    let fontSize = 15;
+    ctx.font = `bold ${fontSize}px Nunito, sans-serif`;
+    while (ctx.measureText(prize).width > maxW && fontSize > 9) {
+      fontSize--;
+      ctx.font = `bold ${fontSize}px Nunito, sans-serif`;
+    }
+    const label = ctx.measureText(prize).width > maxW
+      ? prize.slice(0, Math.floor(prize.length * maxW / ctx.measureText(prize).width) - 1) + '…'
+      : prize;
+
+    ctx.fillText(label, R - 16, fontSize / 3);
+    ctx.restore();
+  });
+
+  // Center circle
+  ctx.beginPath();
+  ctx.arc(CX, CY, 36, 0, Math.PI * 2);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+  ctx.strokeStyle = '#e8865a';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+}
+
+function isLight(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return (r*299 + g*587 + b*114) / 1000 > 160;
+}
+
+// ─── Prize list UI ───────────────────────────────────────────────────────────
+function renderList() {
+  const ul = document.getElementById('prizeList');
+  ul.innerHTML = '';
+  if (prizes.length === 0) {
+    ul.innerHTML = '<li class="empty-hint">Список пуст — добавьте призы</li>';
+  }
+  prizes.forEach((p, i) => {
+    const li = document.createElement('li');
+    li.className = 'prize-item';
+    li.innerHTML = `
+      <span class="prize-dot" style="background:${PALETTE[i % PALETTE.length]}"></span>
+      <input class="prize-name" value="${escHtml(p)}" data-i="${i}" maxlength="40">
+      <button class="prize-remove" data-i="${i}" title="Удалить">×</button>
+    `;
+    ul.appendChild(li);
+  });
+
+  ul.querySelectorAll('.prize-name').forEach(inp => {
+    inp.addEventListener('change', e => {
+      prizes[+e.target.dataset.i] = e.target.value.trim() || prizes[+e.target.dataset.i];
+      drawWheel(currentAngle);
+    });
+  });
+  ul.querySelectorAll('.prize-remove').forEach(btn => {
+    btn.addEventListener('click', e => {
+      prizes.splice(+e.target.dataset.i, 1);
+      renderList();
+      drawWheel(currentAngle);
+    });
+  });
+
+  drawWheel(currentAngle);
+  updateSpinBtn();
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function updateSpinBtn() {
+  const disabled = prizes.length < 2 || spinning;
+  document.getElementById('spinBtn').disabled = disabled;
+  document.getElementById('spinCenter').disabled = disabled;
+}
+
+// ─── Add prize ────────────────────────────────────────────────────────────────
+function addPrize() {
+  const inp = document.getElementById('addInput');
+  const val = inp.value.trim();
+  if (!val) return;
+  prizes.push(val);
+  inp.value = '';
+  renderList();
+}
+
+document.getElementById('addBtn').addEventListener('click', addPrize);
+document.getElementById('addInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addPrize();
+});
+
+// ─── Spin ─────────────────────────────────────────────────────────────────────
+function spin() {
+  if (spinning || prizes.length < 2) return;
+  spinning = true;
+  updateSpinBtn();
+
+  const slice = (Math.PI * 2) / prizes.length;
+  // Pick a random winner sector
+  const winnerIndex = Math.floor(Math.random() * prizes.length);
+
+  // We want the pointer (at angle=0, right side) to land in winnerIndex sector
+  // Pointer is at the right side (3 o'clock = 0 rad)
+  // After rotation, sector i occupies [currentAngle + i*slice, currentAngle + (i+1)*slice]
+  // We want pointer (0) to be inside sector winnerIndex
+  // => currentAngle + winnerIndex*slice + slice/2 ≡ 0 (mod 2π)  → target midpoint at pointer
+  // => finalAngle = -(winnerIndex * slice + slice/2)
+  // + add several full rotations for drama
+
+  const extraSpins = (5 + Math.floor(Math.random() * 4)) * Math.PI * 2;
+  const targetAngle = -(winnerIndex * slice + slice / 2 - Math.random() * slice * 0.5);
+  const totalRotation = extraSpins + targetAngle - (currentAngle % (Math.PI * 2));
+
+  const duration = 4000 + Math.random() * 1200;
+  const startAngle = currentAngle;
+  const startTime = performance.now();
+
+  function easeOut(t) {
+    return 1 - Math.pow(1 - t, 4);
+  }
+
+  function frame(now) {
+    const elapsed = now - startTime;
+    const t = Math.min(elapsed / duration, 1);
+    currentAngle = startAngle + totalRotation * easeOut(t);
+    drawWheel(currentAngle);
+
+    if (t < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      currentAngle = startAngle + totalRotation;
+      spinning = false;
+      updateSpinBtn();
+      // Determine actual winner from final angle
+      const norm = ((currentAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+      const pointerAngle = (Math.PI * 2 - norm) % (Math.PI * 2);
+      const idx = Math.floor(pointerAngle / slice) % prizes.length;
+      showWinner(prizes[idx]);
+    }
+  }
+
+  requestAnimationFrame(frame);
+}
+
+document.getElementById('spinBtn').addEventListener('click', spin);
+document.getElementById('spinCenter').addEventListener('click', spin);
+
+// ─── Winner overlay ───────────────────────────────────────────────────────────
+function showWinner(prize) {
+  document.getElementById('winnerText').textContent = prize;
+  document.getElementById('overlay').classList.add('show');
+}
+
+document.getElementById('closeBtn').addEventListener('click', () => {
+  document.getElementById('overlay').classList.remove('show');
+});
+
+// ─── Reset ────────────────────────────────────────────────────────────────────
+document.getElementById('resetBtn').addEventListener('click', () => {
+  currentAngle = 0;
+  drawWheel(currentAngle);
+});
+
+// ─── Fullscreen ───────────────────────────────────────────────────────────────
+document.getElementById('fsBtn').addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+    document.getElementById('fsBtn').textContent = '✕ Выйти из полного экрана';
+  } else {
+    document.exitFullscreen();
+    document.getElementById('fsBtn').textContent = '⛶ Полный экран';
+  }
+});
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+renderList();
+</script>
+</body>
+</html>
